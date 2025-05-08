@@ -63,12 +63,17 @@ class Game:
             if keys[pygame.K_UP]:
                 self.player0.y -= self.player_speed * dt
 
+            # Boundaries for players
+            self.player1.x = max(0, min(self.res[0] - self.player1.width, self.player1.x))
+            self.player1.y = max(0, min(self.res[1] - self.player1.height, self.player1.y))
+            self.player0.x = max(0, min(self.res[0] - self.player0.width, self.player0.x))
+            self.player0.y = max(0, min(self.res[1] - self.player0.height, self.player0.y))
 
             # Drawing
             self.screen.fill(self.black)  
             pygame.draw.rect(self.screen, "blue", self.player1) 
             pygame.draw.rect(self.screen, "red", self.player0)
-            pygame.display.flip()  # Update the display
+            pygame.display.flip() 
 
 
 # Create an instance of the Game class
