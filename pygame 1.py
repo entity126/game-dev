@@ -30,8 +30,8 @@ class Game:
         self.player0_direction = (1, 0)  # Default direction for player 0
 
         # HP attributes
-        self.player1_hp = 5
-        self.player0_hp = 5
+        self.player1_hp = 10
+        self.player0_hp = 10
         self.player1_score = 0
         self.player0_score = 0
 
@@ -39,8 +39,8 @@ class Game:
         # Reset player positions and HP
         self.player0.x, self.player0.y = 1100, 500
         self.player1.x, self.player1.y = 100, 200
-        self.player1_hp = 5
-        self.player0_hp = 5
+        self.player1_hp = 10
+        self.player0_hp = 10
         self.projectiles.clear()
         self.player1_direction = (1, 0)
         self.player0_direction = (1, 0)
@@ -140,6 +140,7 @@ class Game:
             self.screen.fill(self.black)  
             pygame.draw.rect(self.screen, "blue", self.player1) 
             pygame.draw.rect(self.screen, "red", self.player0)
+            
             # Draw HP and Score
             font = pygame.font.SysFont(None, 36)
             hp1 = font.render(f"Player 1 HP: {self.player1_hp}", True, self.white)
