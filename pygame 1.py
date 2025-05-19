@@ -20,14 +20,30 @@ class Game:
         self.black = (0, 0, 0) 
         
         # instances
-        self.player0 = Rect(100, 500, 50, 50)
-        self.player1 = Rect(100, 500, 50, 50)
+        self.player0 = Rect(1100, 500, 50, 50)
+        self.player1 = Rect(100, 200, 50, 50)
         
         
         self.player_speed = 300  # Speed in pixels per second
         self.projectiles = []  # List to store projectiles
         self.player1_direction = (1, 0)  # Default direction for player 1
         self.player0_direction = (1, 0)  # Default direction for player 0
+
+        # HP attributes
+        self.player1_hp = 5
+        self.player0_hp = 5
+        self.player1_score = 0
+        self.player0_score = 0
+
+    def reset_players(self):
+        # Reset player positions and HP
+        self.player0.x, self.player0.y = 1100, 500
+        self.player1.x, self.player1.y = 100, 200
+        self.player1_hp = 5
+        self.player0_hp = 5
+        self.projectiles.clear()
+        self.player1_direction = (1, 0)
+        self.player0_direction = (1, 0)
 
     def gameloop(self):
         while self.run:
@@ -47,7 +63,7 @@ class Game:
                             color="yellow",
                             size=10
                         ))
-                    elif event.key == pygame.K_LSHIFT:  # Player 0 shoots
+                    elif event.key == pygame.K_RSHIFT:  # Player 0 shoots
                         self.projectiles.append(Projectile(
                             self.player0.x + self.player0.width // 2,
                             self.player0.y + self.player0.height // 2,
@@ -95,15 +111,45 @@ class Game:
             # Update projectiles
             for projectile in self.projectiles[:]:
                 projectile.move(dt)
+                # Check collision with player1 (blue), skip if projectile owner is player1
+                if projectile.direction == self.player1_direction:
+                    if self.player0.colliderect(projectile.rect):
+                        self.player0_hp -= 1
+                        self.projectiles.remove(projectile)
+                        continue
+                # Check collision with player0 (red), skip if projectile owner is player0
+                elif projectile.direction == self.player0_direction:
+                    if self.player1.colliderect(projectile.rect):
+                        self.player1_hp -= 1
+                        self.projectiles.remove(projectile)
+                        continue
                 # Remove projectile if it goes off-screen
                 if projectile.rect.bottom < 0 or projectile.rect.top > self.res[1] or \
                    projectile.rect.right < 0 or projectile.rect.left > self.res[0]:
                     self.projectiles.remove(projectile)
 
+            # Check for HP reaching 0 and update score/restart
+            if self.player1_hp <= 0:
+                self.player0_score += 1
+                self.reset_players()
+            elif self.player0_hp <= 0:
+                self.player1_score += 1
+                self.reset_players()
+
             # Drawing
             self.screen.fill(self.black)  
             pygame.draw.rect(self.screen, "blue", self.player1) 
             pygame.draw.rect(self.screen, "red", self.player0)
+            # Draw HP and Score
+            font = pygame.font.SysFont(None, 36)
+            hp1 = font.render(f"Player 1 HP: {self.player1_hp}", True, self.white)
+            hp0 = font.render(f"Player 0 HP: {self.player0_hp}", True, self.white)
+            score1 = font.render(f"Score: {self.player1_score}", True, self.white)
+            score0 = font.render(f"Score: {self.player0_score}", True, self.white)
+            self.screen.blit(hp1, (20, 20))
+            self.screen.blit(score1, (20, 60))
+            self.screen.blit(hp0, (self.res[0] - 220, 20))
+            self.screen.blit(score0, (self.res[0] - 220, 60))
             for projectile in self.projectiles:
                 projectile.draw(self.screen)
             pygame.display.flip() 
